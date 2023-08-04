@@ -2,6 +2,7 @@ package com.rupesh;
 
 import com.rupesh.configuration.CassandraClientProvider;
 import com.rupesh.configuration.CustomRetrieverConfiguration;
+import com.rupesh.kafka.KafkaConnectionProvider;
 import com.rupesh.mqtt.MqttClientConfiguration;
 import com.rupesh.mqtt.MqttServerConfiguration;
 import com.rupesh.verticle.UserRestServer;
@@ -23,8 +24,10 @@ public class MainVerticle extends AbstractVerticle {
 
     CustomRetrieverConfiguration.init(vertx).onSuccess((success) -> {
 
-      MqttClientConfiguration.produceMessage(vertx, "test",new String("Hello"));
-      MqttServerConfiguration.start(vertx);
+//      MqttClientConfiguration.produceMessage(vertx, "test",new String("Hello"));
+//      MqttServerConfiguration.start(vertx);
+      KafkaConnectionProvider.getConnection(vertx);
+
 
       CassandraClientProvider
         .pingCassandraConnection(client)
