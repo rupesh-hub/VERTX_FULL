@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+      </profile>
+      <profile name="Annotation profile for DEMO-CRUD" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject-java/4.0.1/micronaut-inject-java-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/2.0.7/slf4j-api-2.0.7.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core-processor/4.0.1/micronaut-core-processor-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-inject/4.0.1/micronaut-inject-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-core/4.0.1/micronaut-core-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/io/micronaut/micronaut-aop/4.0.1/micronaut-aop-4.0.1.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-tree/9.5/asm-tree-9.5.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm/9.5/asm-9.5.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/ow2/asm/asm-commons/9.5/asm-commons-9.5.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-symbol-solver-core/3.25.4/javaparser-symbol-solver-core-3.25.4.jar" />
+          <entry name="$MAVEN_REPOSITORY$/com/github/javaparser/javaparser-core/3.25.4/javaparser-core-3.25.4.jar" />
+        </processorPath>
+        <module name="DEMO-CRUD" />
+      </profile>
+    </annotationProcessing>
+  </component>
+</project>
