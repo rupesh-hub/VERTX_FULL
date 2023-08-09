@@ -29,5 +29,8 @@
         <module name="DEMO-CRUD" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="DEMO-CRUD" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>
