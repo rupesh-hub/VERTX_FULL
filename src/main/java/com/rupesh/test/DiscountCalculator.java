@@ -1,82 +1,75 @@
 package com.rupesh.test;
 
+import com.rupesh.enums.ApplicableType;
+import com.rupesh.enums.DiscountType;
+import com.rupesh.payload.CalculateDiscountRequest;
+
 import java.util.Arrays;
 
 public class DiscountCalculator {
 
-  enum ApplicableType {
-    HIGHER("higher"),
-    LOWER("lower"),
-    COMBINATION("combination");
+  /**
+   * * method is applicable for all type of configuration, daily_limit, monthly_limit
+   * * (per_user + per_user_per_day + per_user_per_month + per_user_per_merchant + per_merchant_per_day + per_merchant_per_month)
+   *
+   * @param request
+   * @return
+   */
+  public static double calculate(final CalculateDiscountRequest request) {
 
-    private String code;
+    /**
+     * first: calculating discount with previously accumulated taken discount
+     * remaining_discount = allowed_discount - previous_taken_discount
+     */
+    Double[] discounts = {
+      (request.getPerUserDiscount() > 0) ? request.getPerUserDiscount() - request.getPerUserDiscountTaken() : Double.POSITIVE_INFINITY,
+      (request.getPerUserPerMerchantDiscount() > 0) ? request.getPerUserPerMerchantDiscount() - request.getPerUserPerMerchantDiscountTaken() : Double.POSITIVE_INFINITY,
+      (request.getPerUserPerDayDiscount() > 0) ? request.getPerUserPerDayDiscount() - request.getPerUserPerDayDiscountTaken() : Double.POSITIVE_INFINITY,
+      (request.getPerUserPerMonthDiscount() > 0) ? request.getPerUserPerMonthDiscount() - request.getPerUserPerMonthDiscountTaken() : Double.POSITIVE_INFINITY,
+      (request.getPerMerchantPerDayDiscount() > 0) ? request.getPerMerchantPerDayDiscount() - request.getPerMerchantPerDayDiscountTaken() : Double.POSITIVE_INFINITY,
+      (request.getPerMerchantPerMonthDiscount() > 0) ? request.getPerMerchantPerMonthDiscount() - request.getPerMerchantPerMonthDiscountTaken() : Double.POSITIVE_INFINITY
+    };
 
-    ApplicableType(String code) {
-      this.code = code;
-    }
+    /**
+     * after getting remaining discount compare them to get the lowest one
+     */
+    var applicableDiscount = Arrays.stream(discounts)
+      .filter(value -> value != Double.POSITIVE_INFINITY)
+      .min(Double::compareTo)
+      .orElse(Double.POSITIVE_INFINITY);
 
-    public static ApplicableType byCode(final String code) {
-      return Arrays.stream(ApplicableType.values()).filter(type -> code.equalsIgnoreCase(type.code)).findFirst().get();
-    }
-  }
+    /**
+     * calculating other parts and returning discount
+     */
+    var percentAmount = ((request.getDiscountPercentage() / 100) * request.getTransactionAmount());
+    var perLower = Math.min(percentAmount, request.getFlatDiscountAmount());
+    var perHigher = Math.max(percentAmount, request.getFlatDiscountAmount());
+    var perBoth = (percentAmount + request.getFlatDiscountAmount());
 
-  enum DiscountType {
-    PERCENTAGE("percentage"),
-    FLAT("flat"),
-    BOTH("both");
-
-    private String code;
-
-    DiscountType(String code) {
-      this.code = code;
-    }
-
-    public static DiscountType byCode(final String code) {
-      return Arrays.stream(DiscountType.values()).filter(i -> code.equalsIgnoreCase(i.code)).findFirst().get();
-    }
-
-  }
-
-  public double calculate(final double amount, final double percentage, final double flatDiscount, final String discountType, final String applicableType) {
-
-    final DiscountType type = DiscountType.byCode(discountType);
-
-    switch (type) {
-      case PERCENTAGE:
-        return percentageDiscount(amount, percentage);
+    switch (DiscountType.byCode(request.getDiscountType())) {
       case FLAT:
-        return amount - flatDiscount;
+        return applicableDiscount <= request.getFlatDiscountAmount() ? applicableDiscount : request.getFlatDiscountAmount();
+
+      case PERCENTAGE:
+        return applicableDiscount <= percentAmount ? applicableDiscount : percentAmount;
+
       case BOTH: {
-        return combinedDiscount(amount, percentage, flatDiscount, ApplicableType.byCode(applicableType));
+        switch (ApplicableType.byCode(request.getApplicableType())) {
+          case LOWER:
+            return applicableDiscount <= perLower ? applicableDiscount : perLower;
+
+          case HIGHER:
+            return applicableDiscount <= perHigher ? applicableDiscount : perHigher;
+
+          case COMBINATION:
+            return perBoth <= applicableDiscount ? perBoth : applicableDiscount;
+
+          default:
+            return 0.0;
+        }
       }
       default:
-        return amount;
-    }
-
-  }
-
-  private double percentageDiscount(double amount, double percentage) {
-    return amount - (percentage * amount) / 100;
-  }
-
-  private double combinedDiscount(final double amount, final double percentage, final double flatDiscount, final ApplicableType condition) {
-    var byPercentage = (percentage * amount) / 100;
-    var byFlat = flatDiscount;
-    var byBoth = byPercentage + byFlat;
-
-    switch (condition) {
-      case HIGHER -> {
-        return (byPercentage >= byFlat) ? amount - byPercentage : amount - byFlat;
-      }
-      case LOWER -> {
-        return (byPercentage < byFlat) ? amount - byPercentage : amount - byFlat;
-      }
-      case COMBINATION -> {
-        return amount - byBoth;
-      }
-      default -> {
-        return amount;
-      }
+        return 0.0;
     }
   }
 
