@@ -1,0 +1,2 @@
+package com.rupesh.enums;public class DiscountType {
+}
